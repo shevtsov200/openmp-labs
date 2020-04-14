@@ -6,7 +6,7 @@
 
 #include<stdio.h>
 
-int A[100000000];
+int A[99999999];
 
 bool isPrime(int n) {
   if (n <= 1) {
@@ -30,7 +30,9 @@ int justCount(int n) {
 
   for (i = 0; i < n; ++i) {
     a2 = A[i];
-    sum = sum + a2 * a2 * a2;
+    if (isPrime(a2)) {
+      sum = sum + a2;
+    }
   }
 
   return sum;
@@ -51,11 +53,13 @@ int countInParallel(int n) {
 
   int a2 = 0;
 
-  #pragma omp parallel for schedule(static, 5) private(i, a2)\
+  #pragma omp parallel for schedule(static, 25) private(i, a2)\
   shared(A) reduction(+: sum)
-  for (i = 0; i < n; i++) {
+  for (i = 0; i < n; ++i) {
     a2 = A[i];
-    sum = sum + a2 * a2 * a2;
+    if (isPrime(a2)) {
+      sum = sum + a2;
+    }
   }
 
   return sum;
@@ -66,8 +70,9 @@ int main() {
   double sum = 0.0;
   int i;
 
-  for (i = 0; i < n; i++) {
-    A[i] = i + 1;
+  #pragma omp parallel for shared(A)
+  for (i = 0; i < n; ++i) {
+    A[i] = 2;
   }
 
   printf("start just count\n");
