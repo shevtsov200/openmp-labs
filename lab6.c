@@ -6,7 +6,7 @@
 
 #include<stdio.h>
 
-int A[99999999];
+int A[15];
 
 bool isPrime(int n) {
   if (n <= 1) {
@@ -52,13 +52,17 @@ int countInParallel(int n) {
   }
 
   int a2 = 0;
+  
+  int a3 = 0;
 
-  #pragma omp parallel for schedule(static, 25) private(i, a2)\
+  #pragma omp parallel for schedule(static, 5) private(i, a2, a3)\
   shared(A) reduction(+: sum)
   for (i = 0; i < n; ++i) {
     a2 = A[i];
     if (isPrime(a2)) {
       sum = sum + a2;
+	  a3 = sum;
+	  printf("intermediate sum: %d\n", a3);
     }
   }
 
@@ -90,6 +94,8 @@ int main() {
   end = clock();
   time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
   printf("count in parallel time = %f\n", time_spent);
+  
+  printf("sum = %f\n", sum);
 
   return (0);
 }
