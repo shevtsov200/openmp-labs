@@ -6,6 +6,8 @@
 
 #include<stdio.h>
 
+#define REQURIED_NUMBER_OF_THREADS 4
+
 int A[15];
 
 bool isPrime(int n) {
@@ -22,47 +24,31 @@ bool isPrime(int n) {
   return true;
 }
 
-int justCount(int n) {
-  int i;
-  double sum = 0.0;
-
-  int a2 = 0;
-
-  for (i = 0; i < n; ++i) {
-    a2 = A[i];
-    if (isPrime(a2)) {
-      sum = sum + a2;
-    }
-  }
-
-  return sum;
-}
-
-int countInParallel(int n) {
-  int i;
-  double sum = 0.0;
-
-  if (omp_get_max_threads() < 4) {
+int countInParallel(int *natural_numbers, int n) {
+  if (omp_get_max_threads() < REQURIED_NUMBER_OF_THREADS) {
     printf("not enough threads");
     getch();
 
     return (0);
   } else {
-    omp_set_num_threads(4);
+    omp_set_num_threads(REQURIED_NUMBER_OF_THREADS);
   }
 
-  int a2 = 0;
+  int i;
+  int natural_number = 0;
   
-  int a3 = 0;
+  double intermidiate_sum = 0.0;
+  double sum = 0.0;
 
-  #pragma omp parallel for schedule(static, 5) private(i, a2, a3)\
-  shared(A) reduction(+: sum)
+  #pragma omp parallel for schedule(static, 5) private(i, natural_number, intermidiate_sum)\
+  shared(natural_numbers) reduction(+: sum)
   for (i = 0; i < n; ++i) {
-    a2 = A[i];
-    if (isPrime(a2)) {
-      sum = sum + a2;
-	  a3 = sum;
-	  printf("intermediate sum: %d\n", a3);
+    natural_number = natural_numbers[i];
+    if (isPrime(natural_number)) {
+      sum = sum + natural_number;
+
+	  intermidiate_sum = sum;
+	  printf("intermediate sum for i=%d = %f\n", i, intermidiate_sum);
     }
   }
 
@@ -71,29 +57,16 @@ int countInParallel(int n) {
 
 int main() {
   int n = sizeof(A) / sizeof(A[0]);
-  double sum = 0.0;
+  
   int i;
-
+  double sum = 0.0;
+  
   #pragma omp parallel for shared(A)
   for (i = 0; i < n; ++i) {
     A[i] = 2;
   }
 
-  printf("start just count\n");
-  clock_t begin = clock();
-
-  sum = justCount(n);
-
-  clock_t end = clock();
-  double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
-  printf("just count time = %f\n", time_spent);
-
-  printf("start count in parallel\n");
-  begin = clock();
-  sum = countInParallel(n);
-  end = clock();
-  time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
-  printf("count in parallel time = %f\n", time_spent);
+  sum = countInParallel(A, n);
   
   printf("sum = %f\n", sum);
 
