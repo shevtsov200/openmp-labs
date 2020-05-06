@@ -1,6 +1,6 @@
 CC=gcc
 CFLAGS=-Wall -fopenmp
-SOURCES=lab6.c
+SOURCES=lab7_2.c
 
 all: program
 
