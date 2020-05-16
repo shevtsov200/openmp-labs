@@ -1,3 +1,7 @@
+#include <stdio.h>
+
+#define N 2
+
 void getCofactor(int mat[N][N], int n, int p, int q, int result[N][N]) 
 { 
     int i = 0, j = 0; 
@@ -25,8 +29,39 @@ void getCofactor(int mat[N][N], int n, int p, int q, int result[N][N])
     } 
 }
 
+int calculateDeterminant(size_t n, int matrix[][n]){
+    float ratio;
+    int i, j, k;
 
+    /* Conversion of matrix to upper triangular */
+    for(i = 0; i < n; i++){
+        for(j = 0; j < n; j++){
+            if(j>i){
+                ratio = matrix[j][i]/matrix[i][i];
+				
+                for(k = 0; k < n; k++){
+                    matrix[j][k] -= ratio * matrix[i][k];
+                }
+            }
+        }
+    }
+    int determinant = 1; //storage for determinant
+    for(i = 0; i < n; i++) {
+        determinant *= matrix[i][i];
+    }
+
+    return determinant;
+}
 
 int main(int argc, char **argv) {
+    int matrix[N][N] = {
+        {1, 2},
+        {3, 4}
+    };
+
+    int det = calculateDeterminant(N, matrix);
+
+    printf("det is %d\n", det);
+
     return 0;
 }
