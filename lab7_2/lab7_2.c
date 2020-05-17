@@ -2,7 +2,18 @@
 
 #define N 2
 
-void getCofactor(int mat[N][N], int n, int p, int q, int result[N][N]) 
+void printMatrix(size_t n, int matrix[][n]) {
+	int i, j;
+
+	for(i = 0; i < n; i++) {
+		for(j = 0; j < n; j++) {
+			printf("%d ", matrix[i][j]);
+		}
+		printf("\n");
+	}
+}
+
+void calculateCofactorMatrix(int mat[N][N], int n, int p, int q, int result[N-1][N-1]) 
 { 
     int i = 0, j = 0; 
 
@@ -53,15 +64,32 @@ int calculateDeterminant(size_t n, int matrix[][n]){
     return determinant;
 }
 
+void calculateAlgebraicComplement(size_t n, int matrix[][n]) {
+	int i, j;
+	
+	for(i = 0; i < n; i++) {
+		for(j = 0; j < n; j++) {
+			int result[n-1][n-1];
+			calculateCofactorMatrix(matrix, n, i, j, result);
+			
+			printf("i=%d j=%d\n",i,j);
+			printMatrix(n-1, result);
+			
+			int determinant = calculateDeterminant(n-1, result);
+			printf("i=%d j=%d det=%d\n",i,j,determinant);
+		}
+	}
+}
+
 int main(int argc, char **argv) {
     int matrix[N][N] = {
         {1, 2},
         {3, 4}
     };
-
-    int det = calculateDeterminant(N, matrix);
-
-    printf("det is %d\n", det);
+	
+	printMatrix(N, matrix);
+	
+	calculateAlgebraicComplement(N, matrix);
 
     return 0;
 }
