@@ -17,19 +17,15 @@ void calculateCofactorMatrix(int mat[N][N], int n, int p, int q, int result[N-1]
 { 
     int i = 0, j = 0; 
 
-    // Looping for each element of the matrix 
+	#pragma omp parallel for collapse(2)	
     for (int row = 0; row < n; row++) 
     { 
         for (int col = 0; col < n; col++) 
         { 
-            //  Copying into temporary matrix only those element 
-            //  which are not in given row and column 
             if (row != p && col != q) 
             { 
                 result[i][j++] = mat[row][col]; 
 
-                // Row is filled, so increase row index and 
-                // reset col index 
                 if (j == n - 1) 
                 { 
                     j = 0; 
@@ -67,13 +63,12 @@ int calculateDeterminant(size_t n, int matrix[][n]){
 void calculateAlgebraicComplement(size_t n, int matrix[][n]) {
 	int i, j;
 	
+	#pragma omp parallel for collapse(2)
 	for(i = 0; i < n; i++) {
 		for(j = 0; j < n; j++) {
 			int result[n-1][n-1];
 			calculateCofactorMatrix(matrix, n, i, j, result);
 			
-			printf("i=%d j=%d\n",i,j);
-			printMatrix(n-1, result);
 			int sign = (j % 2) ? -1 : 1;
 			int determinant = calculateDeterminant(n-1, result);
 			int algebraicComplement = sign * determinant;
