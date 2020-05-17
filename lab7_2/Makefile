@@ -10,4 +10,4 @@ program: $(SOURCES)
 clean:
 	rm program
 run: program
-	./program
+	./program $(ARGS)

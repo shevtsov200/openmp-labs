@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <omp.h>
+#include <stdlib.h> 
 
 #define N 2
 
@@ -82,6 +84,13 @@ int main(int argc, char **argv) {
         {1, 2},
         {3, 4}
     };
+	
+	int threads_number = omp_get_max_threads();
+    if (argc >= 2) {
+        threads_number = atoi(argv[1]);
+		printf("set max threads: %d\n", threads_number);
+		omp_set_num_threads(threads_number);
+    }
 	
 	printMatrix(N, matrix);
 	
