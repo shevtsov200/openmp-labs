@@ -74,9 +74,10 @@ void calculateAlgebraicComplement(size_t n, int matrix[][n]) {
 			
 			printf("i=%d j=%d\n",i,j);
 			printMatrix(n-1, result);
-			
+			int sign = (j % 2) ? -1 : 1;
 			int determinant = calculateDeterminant(n-1, result);
-			printf("i=%d j=%d det=%d\n",i,j,determinant);
+			int algebraicComplement = sign * determinant;
+			printf("i=%d j=%d algebraic complement=%d\n",i,j,algebraicComplement);
 		}
 	}
 }
