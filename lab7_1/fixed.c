@@ -12,8 +12,11 @@ int main(int argc, char** argv)
     #pragma omp parallel for
     for (int i=0; i<N; i++)
     {
-        b[i]=i*tan(i*3.14/N);
-        s+=b[i];
+        //b[i]=i*tan(i*3.14/N);
+        //s+=b[i];
+        double tmp = i*tan(i*3.14/N);
+        b[i] = tmp;
+        s += tmp;
     }
 
     printf(“%f “,s);
