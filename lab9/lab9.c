@@ -4,11 +4,8 @@
 #include <time.h>
 
 #define CENTRAL_BANK 0
-#define BANK_1 1
-#define BANK_2 2
-#define BANK_3 3
 
-#define MAX_TRANSACTIONS 1
+#define MAX_TRANSACTIONS 2
 
 int main(int argc, char **argv) {
     MPI_Init(NULL, NULL);
@@ -62,7 +59,7 @@ int main(int argc, char **argv) {
 
         while(transaction_count < MAX_TRANSACTIONS) { 
             int transfer_sum = rand() % 100;
-            int destination_bank = rand() % (4 - 1) + 1;
+            int destination_bank = rand() % (size - 1) + 1;
 
             int data[2];
             data[0] = destination_bank;
