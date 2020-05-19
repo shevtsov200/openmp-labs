@@ -2,7 +2,7 @@ CC=mpicc
 CFLAGS=-g
 SOURCES=lab9.c
 
-SIZE=1
+SIZE=4
 
 all: program
 
