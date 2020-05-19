@@ -8,7 +8,7 @@
 #define BANK_2 2
 #define BANK_3 3
 
-#define MAX_TRANSACTIONS 5
+#define MAX_TRANSACTIONS 1
 
 int main(int argc, char **argv) {
     MPI_Init(NULL, NULL);
@@ -62,7 +62,7 @@ int main(int argc, char **argv) {
 
         while(transaction_count < MAX_TRANSACTIONS) { 
             int transfer_sum = rand() % 100;
-            int destination_bank = rand() % 4;
+            int destination_bank = rand() % (4 - 1) + 1;
 
             int data[2];
             data[0] = destination_bank;
@@ -77,7 +77,10 @@ int main(int argc, char **argv) {
                     /* tag          = */ 0,
                     /* communicator = */ MPI_COMM_WORLD
                     );
+            ++transaction_count;
+        }		
 
+        while(1==1){
             int transfered_sum;
             MPI_Status status;
 
@@ -92,7 +95,7 @@ int main(int argc, char **argv) {
                     );
 
             printf("BANK%d: Received sum: %d\n", rank, transfered_sum);
-        }		
+        }
     }	
     MPI_Finalize();
 
