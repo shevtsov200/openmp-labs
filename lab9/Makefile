@@ -1,13 +1,15 @@
-CC=gcc
-CFLAGS=-Wall -fopenmp
+CC=mpicc
+CFLAGS=-g
 SOURCES=lab9.c
+
+SIZE=1
 
 all: program
 
 program: $(SOURCES)
-	$(CC) $(CFLAGS) $(SOURCES) -o program
+	$(CC) $(CFLAGS) $(SOURCES) -o program.o
 
 clean:
 	rm program
 run: program
-	./program $(ARGS)
+	mpiexec -np $(SIZE) ./program.o $(ARGS)

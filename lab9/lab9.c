@@ -11,8 +11,8 @@ int main(int argc, char **argv) {
 
 	int rank, size;
 	
-	MPI_Comm_size(MPI_COMM_WORLD, &size); //get number of processes
-	MPI_Comm_rank(MPI_COMM_WORLD, &rank); //get my process id
+	MPI_Comm_size(MPI_COMM_WORLD, &size); 
+	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
 	if (size < 4) {
         fprintf(stderr, "we need 3 banks and 1 central bank, but have only %d\n", size);
@@ -49,7 +49,9 @@ int main(int argc, char **argv) {
 		printf("central bank sent sum %d\n to bank %d\n", transfer_sum, destination_bank);
 	} else {
 		int transfered_sum;
-		MPI_Recv(
+		MPI_Status status;
+        
+        MPI_Recv(
 		/* data         = */ &transfered_sum,
 		/* count        = */ 1,
 		/* datatype     = */ MPI_INT,
