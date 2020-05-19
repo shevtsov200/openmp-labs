@@ -14,7 +14,7 @@ int main(int argc, char** argv)
     {
 		//b[i]=i*tan(i*3.14/N);
 		//s+=b[i];
-		double tmp = i*tan(i*3.14/N)
+		double tmp = i*tan(i*3.14/N);
         b[i] = tmp;
         s += tmp;
     }
