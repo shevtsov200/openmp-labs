@@ -1,18 +1,17 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpi.h>
+#include <stdbool.h> 
 #include <time.h>
+#include <mpi.h>
 
-#define JOHN_SILVER 0
+#define JOHN_SILVER_CAMP 0
 
-#define ISLAND_MAX_SECTIONS 10
-
-int ask_pirates_who_is_free() {
-    int free_pirate_rank;
+int hear_answer_from_pirate() {
+    int pirate_section;
     MPI_Status status;
 
     MPI_Recv(
-            /* data         = */ &free_pirate_rank,
+            /* data         = */ &pirate_section,
             /* count        = */ 1,
             /* datatype     = */ MPI_INT,
             /* source       = */ MPI_ANY_SOURCE,
@@ -21,35 +20,7 @@ int ask_pirates_who_is_free() {
             /* status       = */ &status
             );
 
-    return free_pirate_rank;
-}
-
-void send_pirate_to_section(int island_section, int pirate_rank) {
-    MPI_Send(
-            /* data         = */ &island_section,
-            /* count        = */ 1,
-            /* datatype     = */ MPI_INT,
-            /* destination  = */ pirate_rank,
-            /* tag          = */ 0,
-            /* communicator = */ MPI_COMM_WORLD
-            );
-}
-
-bool hear_answer_of_pirate() {
-    bool is_treasure_found;
-    MPI_Status status;
-
-    MPI_Recv(
-            /* data         = */ &is_treasure_found,
-            /* count        = */ 1,
-            /* datatype     = */ MPI_C_BOOL,
-            /* source       = */ MPI_ANY_SOURCE,
-            /* tag          = */ 0,
-            /* communicator = */ MPI_COMM_WORLD,
-            /* status       = */ &status
-            );
-
-    return free_pirate_rank;
+    return pirate_section;
 }
 
 int main(int argc, char **argv) {
@@ -67,56 +38,46 @@ int main(int argc, char **argv) {
 
     srand(time(NULL) + rank);
 
-    if (rank == JOHN_SILVER) {
-        int section_with_treasure = rand() % ISLAND_MAX_SECTIONS; 
+    int island_section = rank;
+    int sections_number = size;
 
-        int section_to_search;
-        for(section_to_search = 0; section_to_search < ISLAND_MAX_SECTIONS; ++section_to_search) {
-            int free_pirate_rank = ask_pirates_who_is_free(); 
-            send_pirate_to_section(section_to_search, free_pirate_rank);
-            bool is_treasure_found = hear_answer_of_pirate();
+    bool treasure_already_found = false;
+
+    if (island_section == JOHN_SILVER_CAMP) {
+        int section_with_treasure = rand() % sections_number; 
+        printf("Treause is at section %d but the pirates do not know this yet.\n", section_with_treasure);
+        int sections_to_search = sections_number;
+
+        while(sections_to_search > 0) {
+            --sections_to_search;
+
+            int pirate_section = hear_answer_from_pirate();
+
+            bool is_treasure_found = pirate_section == section_with_treasure;
+
+            if(is_treasure_found) {
+                printf("Pirate from section %d has returned with treasure!\n", pirate_section);
+                treasure_already_found = is_treasure_found;
+            } else if (treasure_already_found) {
+                printf("pirate from section %d has not found anything, but everyone is celebrating already.\n", pirate_section);
+            } else {
+                printf("pirate from section %d has returned with nothing. John Silver is getting angry.\n", pirate_section);
+            }
         }
     } else {
-        int transaction_count = 0;
+        printf("Pirate has ventured deeper into island's territory to explore section %d.\n", island_section);
 
-        while(transaction_count < MAX_TRANSACTIONS) { 
-            int transfer_sum = rand() % 100;
-            int destination_bank = rand() % (size - 1) + 1;
-
-            int data[2];
-            data[0] = destination_bank;
-            data[1] = transfer_sum;
-
-            printf("BANK%d: Sent sum %d destination %d to central bank\n", rank, transfer_sum, destination_bank);
-            MPI_Send(
-                    /* data         = */ &data,
-                    /* count        = */ 2,
-                    /* datatype     = */ MPI_INT,
-                    /* destination  = */ CENTRAL_BANK,
-                    /* tag          = */ 0,
-                    /* communicator = */ MPI_COMM_WORLD
-                    );
-            ++transaction_count;
-        }		
-
-        while(1){
-            int transfered_sum;
-            MPI_Status status;
-
-            MPI_Recv(
-                    /* data         = */ &transfered_sum,
-                    /* count        = */ 1,
-                    /* datatype     = */ MPI_INT,
-                    /* source       = */ MPI_ANY_SOURCE,
-                    /* tag          = */ 0,
-                    /* communicator = */ MPI_COMM_WORLD,
-                    /* status       = */ &status
-                    );
-
-            printf("BANK%d: Received sum: %d\n", rank, transfered_sum);
-        }
+        MPI_Send(
+                /* data         = */ &island_section,
+                /* count        = */ 1,
+                /* datatype     = */ MPI_INT,
+                /* destination  = */ JOHN_SILVER_CAMP,
+                /* tag          = */ 0,
+                /* communicator = */ MPI_COMM_WORLD
+                );
     }	
-    MPI_Finalize();
 
+    MPI_Finalize();
+    
     return 0;
 }
